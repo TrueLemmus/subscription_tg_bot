@@ -1,3 +1,5 @@
 /.venv
 .env
 *.db
+*.pyc
+to_do.txt
