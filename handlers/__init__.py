@@ -1,12 +1,10 @@
-from aiogram import Dispatcher
-
-from .start import router as start_router
-from .help import router as help_router
-from .tariff_plan import router as tariff_router
-# Импортируйте другие роутеры
-
-
-def register_handlers(dp: Dispatcher):
-    dp.include_router(start_router)
-    dp.include_router(help_router)
-    dp.include_router(tariff_router)
+from .start import command_start_handler
+from .help import command_help_handler
+from .payment import payment_handler
+from .callback import (plan_callback_handler,
+                       move_to_payment_callback,
+                       payment_method_callback,
+                       telegram_wallet_payment_callback,
+                       sbp_payment_callback,
+                       payed_callback,
+                       )
