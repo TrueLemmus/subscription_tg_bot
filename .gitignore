@@ -3,3 +3,4 @@
 *.db
 *.pyc
 to_do.txt
+__pycache__/

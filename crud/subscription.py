@@ -63,3 +63,20 @@ async def delete_subscription(session: AsyncSession,
     if subscription:
         await session.delete(subscription)
         await session.commit()
+
+
+async def renew_subscription(session: AsyncSession,
+                             subscription_id: int,
+                             type: SubscriptionType,
+                             status: SubscriptionStatus = SubscriptionStatus.ACTIVE) -> Subscription:
+    subscription: Subscription = await get_subscription_by_id(session, subscription_id)
+    if subscription:
+        if type != SubscriptionType.LIFETIME:
+            end_date = subscription.end_date + timedelta(days=type.value * 30)  # Примерный расчет
+        else:
+            end_date = None  # Бессрочная подписка
+        subscription.end_date = end_date
+        subscription.type = type
+        await session.commit()
+        await session.refresh(subscription)
+    return subscription

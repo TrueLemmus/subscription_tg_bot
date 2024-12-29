@@ -11,7 +11,8 @@ from .subscription import (
     get_subscription_by_id,
     get_subscriptions_by_user,
     update_subscription_status,
-    delete_subscription
+    delete_subscription,
+    renew_subscription
 )
 
 __all__ = [
@@ -26,5 +27,6 @@ __all__ = [
     "get_subscription_by_id",
     "get_subscriptions_by_user",
     "update_subscription_status",
-    "delete_subscription"
+    "delete_subscription",
+    "renew_subscription",
 ]
