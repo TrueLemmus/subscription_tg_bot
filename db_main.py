@@ -6,8 +6,11 @@ from crud import (
     get_subscriptions_by_user,
     update_subscription_status,
     delete_subscription,
-    renew_subscription
+    renew_subscription,
+    get_subscriptions_to_cancel,
+    
 )
+from utils import cancel_subscriptions
 from models import SubscriptionType, SubscriptionStatus
 
 
@@ -16,8 +19,9 @@ async def main():
     # await init_models()
 
     # Создание новой сессии
+    await cancel_subscriptions()
     async with AsyncSessionLocal() as session:
-        await renew_subscription(session, 3, SubscriptionType.LIFETIME)
+        print(await get_subscriptions_to_cancel(session))
 
     #     # Создание нового пользователя
     #     user = await create_user(session, "Иван Иванов")
@@ -42,10 +46,6 @@ async def main():
     #         new_status=SubscriptionStatus.EXPIRED
     #     )
     #     print(f"Обновленная подписка: {updated_subscription}")
-
-        # Удаление подписки
-        # await delete_subscription(session, subscription.id)
-        # print(f"Подписка с id {subscription.id} удалена.")
 
 if __name__ == "__main__":
     asyncio.run(main())

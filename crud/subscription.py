@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from models import Subscription, SubscriptionType, SubscriptionStatus
@@ -80,3 +81,14 @@ async def renew_subscription(session: AsyncSession,
         await session.commit()
         await session.refresh(subscription)
     return subscription
+
+
+async def get_subscriptions_to_cancel(session: AsyncSession) -> List[Subscription]:
+    result = await session.execute(
+        select(Subscription).where(
+            Subscription.end_date <= date.today(),
+            Subscription.status == SubscriptionStatus.ACTIVE
+            )
+        )
+    subscriptions = result.scalars().all()
+    return subscriptions
