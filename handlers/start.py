@@ -16,7 +16,10 @@ async def command_start_handler(message: types.Message,  state: FSMContext):
     async with AsyncSessionLocal() as session:
         user = await get_user_by_id(session=session, user_id=message.from_user.id)
         if not user:
-            user = await create_user(session=session, full_name=message.from_user.full_name, id=message.from_user.id)
+            user = await create_user(session=session,
+                                     full_name=message.from_user.full_name,
+                                     id=message.from_user.id,
+                                     user_name=message.from_user.username)
     logging.info(user)
     text = f'Приветствую {message.from_user.first_name}!\nВыберите одно из возможных действий:'
     await message.answer(text=text, reply_markup=start_handler_inline_keyboard())
