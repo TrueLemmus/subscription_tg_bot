@@ -4,7 +4,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.enums import ParseMode
 from config import config
 from routers import main_router
-from handlers import *
+
 
 from states import UserStates
 

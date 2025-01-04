@@ -3,6 +3,7 @@ import logging
 import sys
 
 from loader import bot, dp
+from handlers import *
 
 
 async def main() -> None:

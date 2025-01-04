@@ -8,6 +8,7 @@ class Config(BaseSettings):
     CELERY_BROKER: str
     CELERY_BACKEND: str
     TIMEZONE: str = 'Europe/Moscow'
+    PRIVATE_CHANNEL_ID: str
 
     class Config:
         env_file = ".env"
