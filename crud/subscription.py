@@ -47,6 +47,14 @@ async def get_subscriptions_by_user(session: AsyncSession,
     return subscriptions
 
 
+async def get_active_subscriptions_by_user(session: AsyncSession,
+                                           user_id: int) -> list[Subscription]:
+    result = await session.execute(select(Subscription).where(Subscription.user_id == user_id,
+                                                              Subscription.status == SubscriptionStatus.ACTIVE))
+    subscriptions = result.scalars().one_or_none()
+    return subscriptions
+
+
 async def update_subscription_status(session: AsyncSession,
                                      subscription_id: int,
                                      new_status: SubscriptionStatus) -> Subscription:

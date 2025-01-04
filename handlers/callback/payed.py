@@ -16,9 +16,12 @@ async def payed_callback(callback_query: types.CallbackQuery, state: FSMContext)
     data = await state.get_data()
     plan = data.get('plan')
     await state.set_state(UserStates.subscription)
-    subscription: Subscription = await subscribe_user(callback_query.message.from_user.id,
+    subscription: Subscription = await subscribe_user(callback_query.from_user.id,
                                                       SubscriptionType(plan))
     await callback_query.answer('Вы оплатили подписку!')
+    await bot.unban_chat_member(chat_id=config.PRIVATE_CHANNEL_ID,
+                                user_id=callback_query.from_user.id,
+                                only_if_banned=True)
     invite_link: types.ChatInviteLink = await bot.create_chat_invite_link(chat_id=config.PRIVATE_CHANNEL_ID,
                                                                           expire_date=datetime.now() + timedelta(days=1),
                                                                           member_limit=1)

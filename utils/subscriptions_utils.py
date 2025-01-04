@@ -3,7 +3,7 @@ from typing import Dict, List
 from config import config
 from db import AsyncSessionLocal
 from models import Subscription, SubscriptionType, SubscriptionStatus
-from crud import (get_subscriptions_by_user,
+from crud import (get_active_subscriptions_by_user,
                   create_subscription, renew_subscription,
                   update_subscription_status, get_subscriptions_to_cancel)
 from .channel_utils import remove_user_from_channel
@@ -11,8 +11,7 @@ from .channel_utils import remove_user_from_channel
 
 async def subscribe_user(user_id: int, subscription_type: SubscriptionType) -> Subscription:
     async with AsyncSessionLocal() as session:
-        subscriptions: List[Subscription] = await get_subscriptions_by_user(session, user_id)
-        subscription: Subscription = subscriptions[0]
+        subscription: Subscription = await get_active_subscriptions_by_user(session, user_id)
         if subscription:
             subscription = await renew_subscription(session, subscription.id, subscription_type)
         else:
