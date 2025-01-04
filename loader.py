@@ -5,7 +5,6 @@ from aiogram.enums import ParseMode
 from config import config
 from routers import main_router
 
-
 from states import UserStates
 
 bot = Bot(token=config.BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))

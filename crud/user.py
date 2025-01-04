@@ -5,8 +5,8 @@ from sqlalchemy.future import select
 from models import User
 
 
-async def create_user(session: AsyncSession, full_name: str, id: Optional[int] = None) -> User:
-    new_user = User(id=id, full_name=full_name)
+async def create_user(session: AsyncSession, user_name: str, full_name: str, id: Optional[int] = None,) -> User:
+    new_user = User(id=id, user_name=user_name, full_name=full_name)
     session.add(new_user)
     await session.commit()
     await session.refresh(new_user)
