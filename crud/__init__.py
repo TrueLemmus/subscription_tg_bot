@@ -17,6 +17,14 @@ from .subscription import (
     get_subscriptions_to_cancel,
 )
 
+from .subscription_plan import (
+    create_subscription_plan,
+    get_subscription_plan,
+    get_all_subscription_plans,
+    update_subscription_plan,
+    delete_subscription_plan,
+)
+
 __all__ = [
     # User CRUD
     'create_user',
@@ -32,5 +40,11 @@ __all__ = [
     'update_subscription_status',
     'delete_subscription',
     'renew_subscription',
-    'get_subscriptions_to_cancel'
+    'get_subscriptions_to_cancel',
+    # Subscription Plan CRUD
+    'create_subscription_plan',
+    'get_subscription_plan',
+    'get_all_subscription_plans',
+    'update_subscription_plan',
+    'delete_subscription_plan',
 ]
