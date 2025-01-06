@@ -9,6 +9,7 @@ class Config(BaseSettings):
     CELERY_BACKEND: str
     TIMEZONE: str = 'Europe/Moscow'
     PRIVATE_CHANNEL_ID: str
+    PAYMENTS_TOKEN: str
 
     class Config:
         env_file = ".env"

@@ -1,35 +1,51 @@
 import asyncio
-from typing import Dict, List
-from config import config
+import json
+import uuid
+
+from typing import List
 from db import AsyncSessionLocal
-from models import Subscription, SubscriptionType, SubscriptionStatus
+from models import Subscription, SubscriptionStatus, SubscriptionPlan
 from crud import (get_active_subscriptions_by_user,
-                  create_subscription, renew_subscription,
-                  update_subscription_status, get_subscriptions_to_cancel)
+                  create_subscription,
+                  renew_subscription,
+                  update_subscription_status,
+                  get_subscriptions_to_cancel,
+                  get_subscription_plan)
 from .channel_utils import remove_user_from_channel
 
 
-async def subscribe_user(user_id: int, subscription_type: SubscriptionType) -> Subscription:
+async def subscribe_user(user_id: int, plan_id: int) -> Subscription:
     async with AsyncSessionLocal() as session:
+        plan: SubscriptionPlan = await get_subscription_plan(session, plan_id)
         subscription: Subscription = await get_active_subscriptions_by_user(session, user_id)
         if subscription:
-            subscription = await renew_subscription(session, subscription.id, subscription_type)
+            subscription = await renew_subscription(session, subscription.id, plan.type)
         else:
-            subscription = await create_subscription(session, user_id, subscription_type)
+            subscription = await create_subscription(session, user_id, plan.type)
         await session.commit()
         await session.refresh(subscription)
         return subscription
 
 
-def get_subscription_cost() -> Dict[str, float]:
-    # 1 3 6 12 LifeTime
-    cost = {}
-    cost['one_month'] = float(config.MONTHLY_COST)
-    cost['three_months'] = round(config.MONTHLY_COST * 3 * 0.84, 0)
-    cost['six_months'] = round(config.MONTHLY_COST * 6 * 0.67, 0)
-    cost['twelve_months'] = round(config.MONTHLY_COST * 12 * 0.50, 0)
-    cost['life_time'] = float(config.MONTHLY_COST * 12)
-    return cost
+def generate_payload(user_id: int) -> str:
+    """
+    Генерирует уникальный payload для платежа.
+
+    :param user_id: Идентификатор пользователя, совершающего платеж
+    :return: Строка payload, закодированная в base64
+    """
+    # Генерация уникального идентификатора заказа
+    order_id = str(uuid.uuid4())
+
+    # Создание словаря с информацией о заказе
+    payload_dict = {
+        'order_id': order_id,
+        'user_id': user_id,
+    }
+
+    # Преобразование словаря в JSON
+    payload_json = json.dumps(payload_dict)
+    return payload_json
 
 
 async def cancel_subscriptions() -> None:
