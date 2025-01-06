@@ -19,9 +19,9 @@ async def subscribe_user(user_id: int, plan_id: int) -> Subscription:
         plan: SubscriptionPlan = await get_subscription_plan(session, plan_id)
         subscription: Subscription = await get_active_subscriptions_by_user(session, user_id)
         if subscription:
-            subscription = await renew_subscription(session, subscription.id, plan.type)
+            subscription = await renew_subscription(session, subscription.id, plan.id)
         else:
-            subscription = await create_subscription(session, user_id, plan.type)
+            subscription = await create_subscription(session, user_id, plan.id)
         await session.commit()
         await session.refresh(subscription)
         return subscription

@@ -26,13 +26,13 @@ class Subscription(Base):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=True)
-    type = Column(Enum(SubscriptionType), nullable=False)
-    status = Column(Enum(SubscriptionStatus),
-                    default=SubscriptionStatus.ACTIVE, nullable=False)
+    subscription_plan_id = Column(Integer, ForeignKey('subscription_plans.id'), nullable=False)
+    status = Column(Enum(SubscriptionStatus), default=SubscriptionStatus.ACTIVE, nullable=False)
 
     user = relationship("User", back_populates="subscriptions")
+    subscription_plan = relationship("SubscriptionPlan", back_populates="subscriptions")
 
     def __repr__(self):
         return (f"<Subscription(id={self.id}, user_id={self.user_id}, "
                 f"start_date={self.start_date}, end_date={self.end_date}, "
-                f"type={self.type}, status={self.status})>")
+                f"subscription_plan_id={self.subscription_plan_id}, status={self.status})>")

@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Enum
+from sqlalchemy.orm import relationship
 from models import Base, SubscriptionType
 
 
@@ -10,6 +11,9 @@ class SubscriptionPlan(Base):
     description = Column(String, nullable=False)
     type = Column(Enum(SubscriptionType), nullable=False)
     price = Column(Integer, nullable=False)
+
+    # Обратная связь с подписками
+    subscriptions = relationship("Subscription", back_populates="subscription_plan")
 
     def __repr__(self):
         return (f"<SubscriptionPlan(id={self.id}, label='{self.label}', "

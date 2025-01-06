@@ -1,22 +1,27 @@
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from models import Subscription, SubscriptionType, SubscriptionStatus
+from models import Subscription, SubscriptionType, SubscriptionStatus, SubscriptionPlan
 from datetime import date, timedelta
+from .subscription_plan import get_subscription_plan
 
 
 async def create_subscription(session: AsyncSession,
                               user_id: int,
-                              type: SubscriptionType,
+                              subscription_plan_id: int,
                               start_date: date = None,
                               end_date: date = None,
                               status: SubscriptionStatus = SubscriptionStatus.ACTIVE) -> Subscription:
+
+    subscription_plan: SubscriptionPlan = await get_subscription_plan(session, subscription_plan_id)
+
     if not start_date:
         start_date = date.today()
 
     if not end_date:
-        if type != SubscriptionType.LIFETIME:
-            end_date = start_date + timedelta(days=type.value * 30)  # Примерный расчет
+        if subscription_plan.type != SubscriptionType.LIFETIME:
+            # Примерный расчет
+            end_date = start_date + timedelta(days=SubscriptionType(subscription_plan.type).value * 30)
         else:
             end_date = None  # Бессрочная подписка
 
@@ -24,7 +29,7 @@ async def create_subscription(session: AsyncSession,
         user_id=user_id,
         start_date=start_date,
         end_date=end_date,
-        type=type,
+        subscription_plan_id=subscription_plan_id,
         status=status
     )
     session.add(new_subscription)
@@ -76,16 +81,18 @@ async def delete_subscription(session: AsyncSession,
 
 async def renew_subscription(session: AsyncSession,
                              subscription_id: int,
-                             type: SubscriptionType,
+                             subscription_plan_id: int,
                              status: SubscriptionStatus = SubscriptionStatus.ACTIVE) -> Subscription:
     subscription: Subscription = await get_subscription_by_id(session, subscription_id)
     if subscription:
-        if type != SubscriptionType.LIFETIME:
-            end_date = subscription.end_date + timedelta(days=type.value * 30)  # Примерный расчет
+        subscription_plan: SubscriptionPlan = await get_subscription_plan(session, subscription_plan_id)
+        if subscription_plan.type != SubscriptionType.LIFETIME:
+            # Примерный расчет
+            end_date = subscription.end_date + timedelta(days=SubscriptionType(subscription_plan.type) * 30)
         else:
             end_date = None  # Бессрочная подписка
         subscription.end_date = end_date
-        subscription.type = type
+        subscription.subscription_plan_id = subscription_plan.id
         await session.commit()
         await session.refresh(subscription)
     return subscription
