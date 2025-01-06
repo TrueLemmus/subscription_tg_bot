@@ -21,7 +21,9 @@ async def create_subscription(session: AsyncSession,
     if not end_date:
         if subscription_plan.type != SubscriptionType.LIFETIME:
             # Примерный расчет
-            end_date = start_date + timedelta(days=SubscriptionType(subscription_plan.type).value * 30)
+            end_date = start_date + \
+                timedelta(days=SubscriptionType(
+                    subscription_plan.type).value * 30)
         else:
             end_date = None  # Бессрочная подписка
 
@@ -85,14 +87,15 @@ async def renew_subscription(session: AsyncSession,
                              status: SubscriptionStatus = SubscriptionStatus.ACTIVE) -> Subscription:
     subscription: Subscription = await get_subscription_by_id(session, subscription_id)
     if subscription:
-        subscription_plan: SubscriptionPlan = await get_subscription_plan(session, subscription_plan_id)
-        if subscription_plan.type != SubscriptionType.LIFETIME:
+        if subscription.subscription_plan.type != SubscriptionType.LIFETIME:
             # Примерный расчет
-            end_date = subscription.end_date + timedelta(days=SubscriptionType(subscription_plan.type) * 30)
+            end_date = subscription.end_date + timedelta(days=SubscriptionType(
+                subscription.subscription_plan.type).value * 30
+            )
         else:
             end_date = None  # Бессрочная подписка
         subscription.end_date = end_date
-        subscription.subscription_plan_id = subscription_plan.id
+        subscription.subscription_plan_id = subscription.subscription_plan_id
         await session.commit()
         await session.refresh(subscription)
     return subscription
@@ -103,7 +106,7 @@ async def get_subscriptions_to_cancel(session: AsyncSession) -> List[Subscriptio
         select(Subscription).where(
             Subscription.end_date <= date.today(),
             Subscription.status == SubscriptionStatus.ACTIVE
-            )
         )
+    )
     subscriptions = result.scalars().all()
     return subscriptions
