@@ -1,10 +1,10 @@
-import logging
+from logger_config import get_logger
 from celery import Celery
 from celery.schedules import crontab
 from config import config
 
 # Настройка логирования
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 celery_app = Celery(
     'subscription_tg_bot',

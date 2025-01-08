@@ -4,3 +4,4 @@
 *.pyc
 to_do.txt
 __pycache__/
+celerybeat-schedule

@@ -8,6 +8,9 @@ from loader import bot
 from utils import subscribe_user
 from config import config
 from models import Subscription
+from logger_config import get_logger
+
+logger = get_logger(__name__)
 
 
 # successful payment
@@ -19,6 +22,7 @@ async def successful_payment_handler(message: Message, state: FSMContext):
 
     if payload != invoice_payload:
         message.answer('Ошибка обработки платежа, обратитесь в поддержку.')
+        logger.error(f'Payload does not match {payload=} != {invoice_payload=}')
         return
 
     await bot.send_message(message.chat.id,
