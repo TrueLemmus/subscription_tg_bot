@@ -1,9 +1,11 @@
+import os
 from pydantic_settings import BaseSettings
 
 
 class Config(BaseSettings):
+    BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
     BOT_TOKEN: str
-    DATABASE_URL: str
+    DATABASE_NAME: str
     CELERY_BROKER: str
     CELERY_BACKEND: str
     TIMEZONE: str = 'Europe/Moscow'

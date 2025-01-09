@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  bot:
+    build: .
+    container_name: telegram_bot
+    volumes:
+      - ./bot:/app
+      - ./data:/app/data  # Для сохранения SQLite базы данных
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    command: python main.py
+    restart: unless-stopped
+
+  celery_worker:
+    build: .
+    container_name: celery_worker
+    volumes:
+      - ./bot:/app
+      - ./data:/app/data
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    command: celery -A celery_app worker --loglevel=info
+    restart: unless-stopped
+
+  celery_beat:
+    build: .
+    container_name: celery_beat
+    volumes:
+      - ./bot:/app
+      - ./data:/app/data
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    command: celery -A celery_app beat --loglevel=info
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  redis_data:
